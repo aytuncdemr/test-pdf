@@ -1,7 +1,4 @@
-import Buttons from "@/components/Buttons";
 import Login from "@/components/LoginForm";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export default function Home() {
 	return (

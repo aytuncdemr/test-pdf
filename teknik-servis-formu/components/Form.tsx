@@ -1,5 +1,5 @@
 import getDate from "@/lib/getDate";
-import { faImage, faPhotoFilm } from "@fortawesome/free-solid-svg-icons";
+import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormEvent, useReducer } from "react";
 import Slider from "./Slider";

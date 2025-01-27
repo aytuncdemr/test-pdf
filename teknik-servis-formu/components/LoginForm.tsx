@@ -29,8 +29,7 @@ const Login = () => {
 
             router.push("/home");
 
-		} catch (err: any) {
-			console.log(err);
+		} catch (err:{message:string}) {
 			setError(err.message || "Birşeyler ters gitti");
 		} finally {
 			setLoading(false);

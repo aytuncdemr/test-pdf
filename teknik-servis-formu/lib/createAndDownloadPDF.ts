@@ -1,5 +1,5 @@
 import { FormData } from "@/components/Form";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, PDFFont, rgb, StandardFonts } from "pdf-lib";
 import { blobToBase64 } from "./blobToBase64";
 
 export default async function createAndDownloadPDF(formData: FormData) {
@@ -18,10 +18,10 @@ export default async function createAndDownloadPDF(formData: FormData) {
 			text: string,
 			maxWidth: number,
 			fontSize: number,
-			font: any
+			font: PDFFont
 		): string[] => {
 			const words = text.split(" ");
-			let lines: string[] = [];
+			const lines: string[] = [];
 			let currentLine = "";
 
 			words.forEach((word) => {
@@ -49,7 +49,7 @@ export default async function createAndDownloadPDF(formData: FormData) {
 				fontSize,
 				font
 			); // Max width to avoid going off the page
-			let offsetY = y;
+			const offsetY = y;
 
 			lines.forEach((line, index) => {
 				firstPage.drawText(line, {

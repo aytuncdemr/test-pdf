@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 	}
 }
 
-export async function GET(request: Request) {
+export async function GET() {
 	try {
 		// Define the directory where PDFs are stored (relative to /public)
 		const pdfDir = path.join(process.cwd(), "public", "pdfs"); // Full path to /public/pdfs
