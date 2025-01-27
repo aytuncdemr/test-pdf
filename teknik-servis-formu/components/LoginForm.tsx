@@ -28,8 +28,12 @@ const Login = () => {
 			}
 
 			router.push("/home");
-		} catch (err: any) {
-			setError(err.message || "Birşeyler ters gitti");
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				setError(err.message || "Birşeyler ters gitti");
+			} else {
+				setError("Birşeyler ters gitti");
+			}
 		} finally {
 			setLoading(false);
 		}
