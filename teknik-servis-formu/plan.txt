@@ -1,0 +1,5 @@
+1-determine project idea and purpose
+2-design logic 
+3-determine code structure and technologies
+4-implement UI and code
+5-test and update

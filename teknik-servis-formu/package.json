@@ -1,0 +1,38 @@
+{
+  "name": "teknik-servis-formu",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "docxtemplater": "^3.58.1",
+    "docxtemplater-image-module": "^3.1.0",
+    "fontkit": "^2.0.4",
+    "next": "15.1.0",
+    "pdf-lib": "^1.17.1",
+    "pizzip": "^3.1.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-dropdown": "^1.11.0",
+    "zlib": "^1.0.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/fontkit": "^2.0.7",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
