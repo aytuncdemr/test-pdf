@@ -8,7 +8,7 @@ const Login = () => {
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
-    const router = useRouter();
+	const router = useRouter();
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
@@ -27,9 +27,8 @@ const Login = () => {
 				throw new Error("Hatalı kullanıcı adı veya şifre");
 			}
 
-            router.push("/home");
-
-		} catch (err:{message:string}) {
+			router.push("/home");
+		} catch (err: any) {
 			setError(err.message || "Birşeyler ters gitti");
 		} finally {
 			setLoading(false);

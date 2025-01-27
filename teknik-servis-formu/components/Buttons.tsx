@@ -48,7 +48,7 @@ export default function Buttons() {
 			)}
 			<button className=" text-gray-700 text-3xl py-2 rounded-lg font-bold">
 				<p className="mb-4">
-					Önceki PDF'ler{" "}
+					Önceki PDF&apos;ler{" "}
 					{pdfFiles && pdfFiles.length > 0
 						? `(${pdfFiles.length})`
 						: null}

@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from 'fs';
+import path from 'path';
 
 interface PDFRequest {
 	pdf: string; // Base64 string of the PDF
