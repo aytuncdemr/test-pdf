@@ -57,8 +57,8 @@ export default function Buttons() {
 				pdfFiles.map(
 					(pdfFile: { name: string; _id: string }, index: number) => {
 						return (
-							<div
-								className="mb-4 cursor-pointer text-2xl text-center text-red-500"
+							<button
+								className="mb-4 inline-block cursor-pointer text-2xl text-center text-red-500"
 								key={index}
 								onClick={async () => {
 									try {
@@ -92,7 +92,7 @@ export default function Buttons() {
 								<p className="text-gray-500 font-bold">
 									{pdfFile.name}
 								</p>
-							</div>
+							</button>
 						);
 					}
 				)}
