@@ -25,7 +25,7 @@ declare global {
 	var mongo: CachedConnection;
 }
 
-let cached = global.mongo || { client: null, db: null };
+const cached: CachedConnection = global.mongo || { client: null, db: null };
 
 export async function connectToDatabase(): Promise<{
 	client: MongoClient;
