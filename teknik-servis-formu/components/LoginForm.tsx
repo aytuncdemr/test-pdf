@@ -19,6 +19,7 @@ const Login = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					"Cache-Control": "no-store", // Prevent the browser from caching
 				},
 				body: JSON.stringify({ name, password }),
 			});

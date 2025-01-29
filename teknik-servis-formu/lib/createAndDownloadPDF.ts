@@ -4,7 +4,11 @@ import { blobToBase64 } from "./blobToBase64";
 
 export default async function createAndDownloadPDF(formData: FormData) {
 	try {
-		const pdfFile = await fetch("/form.pdf");
+		const pdfFile = await fetch("/form.pdf", {
+			headers: {
+				"Cache-Control": "no-store", // Prevent the browser from caching
+			},
+		});
 		const arrayBuffer = await pdfFile.arrayBuffer();
 
 		const pdfDoc = await PDFDocument.load(arrayBuffer);
@@ -106,6 +110,7 @@ export default async function createAndDownloadPDF(formData: FormData) {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				"Cache-Control": "no-store", // Prevent the browser from caching
 			},
 		});
 	} catch (error) {

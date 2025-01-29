@@ -17,10 +17,87 @@ export async function POST(request: Request) {
 		// Save the PDF
 		await savePDF(pdfBuffer, data.name);
 
-		return new Response("Başarıyla pdf kaydedildi", { status: 200 });
+		// Set Cache-Control header to prevent caching
+		return new Response("Başarıyla pdf kaydedildi", {
+			status: 200,
+			headers: {
+				"Cache-Control":
+					"no-store, no-cache, must-revalidate, proxy-revalidate",
+			},
+		});
 	} catch (error) {
 		console.error("Error handling the request:", error);
-		return new Response("Bir hata oluştu", { status: 500 });
+		return new Response("Bir hata oluştu", {
+			status: 500,
+			headers: {
+				"Cache-Control":
+					"no-store, no-cache, must-revalidate, proxy-revalidate",
+			},
+		});
+	}
+}
+
+export async function GET(request: Request) {
+	try {
+		// Parse the query parameters
+		const url = new URL(request.url);
+		const id = url.searchParams.get("id");
+
+		const { db } = await connectToDatabase();
+		const collection = db.collection("pdfs");
+
+		if (id) {
+			// Find the document by its ObjectId
+			const pdf = await collection.findOne({ _id: new ObjectId(id) });
+
+			if (!pdf) {
+				return new Response("PDF not found", {
+					status: 404,
+					headers: {
+						"Cache-Control":
+							"no-store, no-cache, must-revalidate, proxy-revalidate",
+					},
+				});
+			}
+
+			// Get the file data (Buffer) and the file name
+			const pdfBuffer = pdf.file.buffer;
+			const fileName = pdf.name;
+
+			// Return the PDF as a response with appropriate headers
+			return new Response(pdfBuffer, {
+				status: 200,
+				headers: {
+					"Content-Type": "application/pdf",
+					"Content-Disposition": `attachment; filename="${fileName}"`,
+					"Cache-Control":
+						"no-store, no-cache, must-revalidate, proxy-revalidate",
+				},
+			});
+		} else {
+			// Case when no 'id' is provided (fetch all PDF names)
+			const pdfs = await collection
+				.find({}, { projection: { name: 1, _id: 1 } })
+				.toArray();
+
+			return new Response(JSON.stringify(pdfs), {
+				status: 200,
+				headers: {
+					"Content-Type": "application/json",
+					"Cache-Control":
+						"no-store, no-cache, must-revalidate, proxy-revalidate",
+				},
+			});
+		}
+	} catch (error) {
+		console.error("Error handling request:", error);
+		return new Response("An error occurred", {
+			status: 500,
+			headers: {
+				"Cache-Control":
+					"no-store, no-cache, must-revalidate, proxy-revalidate",
+			},
+		});
 	}
 }
 
@@ -40,49 +117,3 @@ const savePDF = async (pdfBuffer: Buffer, fileName: string) => {
 		console.error("Error saving PDF to MongoDB:", error);
 	}
 };
-
-export async function GET(request: Request) {
-	try {
-		// Parse the query parameters
-		const url = new URL(request.url);
-		const id = url.searchParams.get("id");
-
-		const { db } = await connectToDatabase();
-		const collection = db.collection("pdfs");
-
-		if (id) {
-			// Find the document by its ObjectId
-			const pdf = await collection.findOne({ _id: new ObjectId(id) });
-
-			if (!pdf) {
-				return new Response("PDF not found", { status: 404 });
-			}
-
-			// Get the file data (Buffer) and the file name
-			const pdfBuffer = pdf.file.buffer;
-			const fileName = pdf.name;
-
-			// Return the PDF as a response with appropriate headers
-			return new Response(pdfBuffer, {
-				status: 200,
-				headers: {
-					"Content-Type": "application/pdf",
-					"Content-Disposition": `attachment; filename="${fileName}"`,
-				},
-			});
-		} else {
-			// Case when no 'id' is provided (fetch all PDF names)
-			const pdfs = await collection
-				.find({}, { projection: { name: 1, _id: 1 } })
-				.toArray();
-
-			return new Response(JSON.stringify(pdfs), {
-				status: 200,
-				headers: { "Content-Type": "application/json" },
-			});
-		}
-	} catch (error) {
-		console.error("Error handling request:", error);
-		return new Response("An error occurred", { status: 500 });
-	}
-}

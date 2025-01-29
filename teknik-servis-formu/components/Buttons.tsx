@@ -16,7 +16,11 @@ export default function Buttons() {
 
 	useEffect(() => {
 		(async function () {
-			const response = await fetch("/api/files");
+			const response = await fetch("/api/files", {
+				headers: {
+					"Cache-Control": "no-store", // Prevent the browser from caching
+				},
+			});
 			const data: { name: string; _id: string }[] = await response.json();
 
 			if (data && data.length > 0) {
@@ -63,7 +67,12 @@ export default function Buttons() {
 								onClick={async () => {
 									try {
 										const response = await fetch(
-											`/api/files?id=${pdfFile._id}`
+											`/api/files?id=${pdfFile._id}`,
+											{
+												headers: {
+													"Cache-Control": "no-store", // Prevent the browser from caching
+												},
+											}
 										);
 
 										// Check if the response is successful
