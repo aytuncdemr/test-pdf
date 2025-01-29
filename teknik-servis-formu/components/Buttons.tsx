@@ -11,14 +11,13 @@ export default function Buttons() {
 	);
 
 	const [pdfFiles, setPdfFiles] = useState<
-		{ name: string; link: string }[] | null
+		{ name: string; _id: string }[] | null
 	>(null);
 
 	useEffect(() => {
 		(async function () {
 			const response = await fetch("/api/files");
-			const data: { name: string; link: string }[] =
-				await response.json();
+			const data: { name: string; _id: string }[] = await response.json();
 
 			if (data && data.length > 0) {
 				setPdfFiles(data);
@@ -31,10 +30,10 @@ export default function Buttons() {
 			{formState === "none" && (
 				<button
 					onClick={() => setFormState("text")}
-					className="bg-green-500 text-white text-3xl py-2 rounded-lg min-h-[24rem] font-bold"
+					className="bg-green-500 text-white text-3xl py-2 rounded-lg min-h-[24rem] group font-bold"
 				>
 					<p className="mb-4">Yeni PDF</p>
-					<div className="border-2 m-auto hover:border-none hover:bg-white hover:text-green-500 duration-100 border-gray-200 rounded-full w-24 h-24 flex items-center justify-center">
+					<div className="border-2 m-auto hover:border-none group-hover:bg-white group-hover:text-green-500 duration-100 border-gray-200 rounded-full w-24 h-24 flex items-center justify-center">
 						<FontAwesomeIcon
 							width={75}
 							height={75}
@@ -46,41 +45,57 @@ export default function Buttons() {
 			{(formState === "text" || formState === "photo") && (
 				<Form formState={formState} setFormState={setFormState}></Form>
 			)}
-			<button className=" text-gray-700 text-3xl py-2 rounded-lg font-bold">
+			<div className=" text-gray-700 mt-4 text-3xl py-2 rounded-lg font-bold text-center">
 				<p className="mb-4">
 					Önceki PDF&apos;ler{" "}
 					{pdfFiles && pdfFiles.length > 0
 						? `(${pdfFiles.length})`
 						: null}
 				</p>
-				{pdfFiles &&
-					pdfFiles.map(
-						(
-							pdfFile: { name: string; link: string },
-							index: number
-						) => {
-							return (
-								<div
-									className="mb-4"
-									key={index}
-									onClick={() => {
-										const anchor =
-											document.createElement("a");
-										anchor.href = pdfFile.link;
-										anchor.download = pdfFile.name;
-										document.body.appendChild(anchor);
-										anchor.click();
-										document.body.removeChild(anchor);
-									}}
-								>
-									<p className="text-gray-500">
-										{pdfFile.name}
-									</p>
-								</div>
-							);
-						}
-					)}
-			</button>
+			</div>
+			{pdfFiles &&
+				pdfFiles.map(
+					(pdfFile: { name: string; _id: string }, index: number) => {
+						return (
+							<div
+								className="mb-4 cursor-pointer text-2xl text-center text-red-500"
+								key={index}
+								onClick={async () => {
+									try {
+										const response = await fetch(
+											`/api/files?id=${pdfFile._id}`
+										);
+
+										// Check if the response is successful
+										if (response.ok) {
+											const blob = await response.blob();
+											const link =
+												document.createElement("a");
+											link.href =
+												URL.createObjectURL(blob);
+											link.download = pdfFile.name; // Set the file name for the download
+											link.click(); // Trigger the download
+											URL.revokeObjectURL(link.href); // Clean up the object URL
+										} else {
+											console.error(
+												"Failed to fetch the PDF"
+											);
+										}
+									} catch (error) {
+										console.error(
+											"Error downloading the file:",
+											error
+										);
+									}
+								}}
+							>
+								<p className="text-gray-500 font-bold">
+									{pdfFile.name}
+								</p>
+							</div>
+						);
+					}
+				)}
 		</div>
 	);
 }

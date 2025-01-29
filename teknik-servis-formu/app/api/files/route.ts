@@ -1,5 +1,6 @@
-import fs from 'fs';
-import path from 'path';
+import { connectToDatabase } from "@/lib/connectMongoDB";
+import getDate from "@/lib/getDate";
+import { Binary, ObjectId } from "mongodb";
 
 interface PDFRequest {
 	pdf: string; // Base64 string of the PDF
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
 		const pdfBuffer = Buffer.from(data.pdf.split(",")[1], "base64"); // Remove the "data:application/pdf;base64," part
 
 		// Save the PDF
-		savePDF(pdfBuffer, data.name);
+		await savePDF(pdfBuffer, data.name);
 
 		return new Response("Başarıyla pdf kaydedildi", { status: 200 });
 	} catch (error) {
@@ -23,47 +24,65 @@ export async function POST(request: Request) {
 	}
 }
 
-export async function GET() {
+const savePDF = async (pdfBuffer: Buffer, fileName: string) => {
 	try {
-		// Define the directory where PDFs are stored (relative to /public)
-		const pdfDir = path.join(process.cwd(), "public", "pdfs"); // Full path to /public/pdfs
+		// Connect to MongoDB
+		const { db } = await connectToDatabase();
+		const collection = db.collection("pdfs");
 
-		// Ensure the directory exists
-		if (!fs.existsSync(pdfDir)) {
-			return new Response("No PDFs found.", { status: 404 });
-		}
-
-		// Read all files in the directory
-		const files = fs
-			.readdirSync(pdfDir)
-			.filter((file: string) => file.endsWith(".pdf"));
-
-		// Generate downloadable links for each file
-		const fileLinks = files.map((file:string) => {
-			// Construct the URL to the file
-			const fileURL = `/pdfs/${encodeURIComponent(file)}`;
-			return { name: file, link: fileURL };
-		});
-
-		// Return the list of file names with their links
-		return new Response(JSON.stringify(fileLinks), {
-			status: 200,
-			headers: { "Content-Type": "application/json" },
+		// Insert the PDF document
+		await collection.insertOne({
+			name: fileName,
+			file: new Binary(pdfBuffer), // Store as BSON Binary
+			uploadedAt: getDate(), // Optional: Store upload timestamp
 		});
 	} catch (error) {
-		console.log(error);
-		return new Response("Beklenmeyen bir hata oluştu", { status: 500 });
+		console.error("Error saving PDF to MongoDB:", error);
+	}
+};
+
+export async function GET(request: Request) {
+	try {
+		// Parse the query parameters
+		const url = new URL(request.url);
+		const id = url.searchParams.get("id");
+
+		const { db } = await connectToDatabase();
+		const collection = db.collection("pdfs");
+
+		if (id) {
+			// Find the document by its ObjectId
+			const pdf = await collection.findOne({ _id: new ObjectId(id) });
+
+			if (!pdf) {
+				return new Response("PDF not found", { status: 404 });
+			}
+
+			// Get the file data (Buffer) and the file name
+			const pdfBuffer = pdf.file.buffer;
+			const fileName = pdf.name;
+
+			// Return the PDF as a response with appropriate headers
+			return new Response(pdfBuffer, {
+				status: 200,
+				headers: {
+					"Content-Type": "application/pdf",
+					"Content-Disposition": `attachment; filename="${fileName}"`,
+				},
+			});
+		} else {
+			// Case when no 'id' is provided (fetch all PDF names)
+			const pdfs = await collection
+				.find({}, { projection: { name: 1, _id: 1 } })
+				.toArray();
+
+			return new Response(JSON.stringify(pdfs), {
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			});
+		}
+	} catch (error) {
+		console.error("Error handling request:", error);
+		return new Response("An error occurred", { status: 500 });
 	}
 }
-
-const savePDF = (pdfBuffer: Buffer, fileName: string) => {
-    const filePath = path.join(process.cwd(), "public", "pdfs", fileName);
-
-	// Ensure the 'pdfs' directory exists
-	const directory = path.dirname(filePath);
-	if (!fs.existsSync(directory)) {
-		fs.mkdirSync(directory, { recursive: true });
-	}
-
-	fs.writeFileSync(filePath, pdfBuffer);
-};

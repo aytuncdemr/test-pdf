@@ -54,10 +54,10 @@ export default function Form({
 
 	async function submitHandler(e: FormEvent) {
 		e.preventDefault();
-		console.log(formData);
-		if (formState === "text" && formData) {
+
+		if (formState === "text" && formData && formData.model) {
 			setFormState("photo");
-		} else {
+		} else if (formState === "photo" && formData && formData.model) {
 			await createAndDownloadPDF(processFormData(formData));
 			setFormState("none");
 		}
@@ -117,7 +117,6 @@ export default function Form({
 						}}
 						value={formData.model || undefined}
 						placeholder="Ürün Modeli"
-						
 					/>
 
 					{/* <input
