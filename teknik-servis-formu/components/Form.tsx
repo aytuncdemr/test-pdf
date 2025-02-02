@@ -210,6 +210,13 @@ export default function Form({
 			{formState === "photo" && (
 				<>
 					<button
+						onClick={() => setFormState("text")}
+						type="button"
+						className="bg-gray-500 text-white text-xl py-2 rounded-lg"
+					>
+						Geri Dön
+					</button>
+					<button
 						type="submit"
 						className="bg-green-500 text-white text-xl py-2 rounded-lg"
 					>
