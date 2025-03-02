@@ -7,8 +7,14 @@ const replaceTurkishChars = (input: string | null): string | null => {
 		.replace(/ş/g, "s")
 		.replace(/ğ/g, "g")
 		.replace(/ı/g, "i")
+		.replace(/ü/g, "u")
+		.replace(/ç/g, "c")
+		.replace(/ö/g, "o")
 		.replace(/Ş/g, "S")
 		.replace(/Ğ/g, "G")
+		.replace(/ç/g, "C")
+		.replace(/Ü/g, "U")
+		.replace(/Ö/g, "O")
 		.replace(/İ/g, "I");
 };
 export const processFormData = (formData: FormData): FormData => {
